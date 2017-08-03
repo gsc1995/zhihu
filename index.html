@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        #canvas {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas" style="background-color:#EEE;" width="1000" height="360"></canvas>
+    <script>
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        // 绘制小球
+        // canvas 拥有很多绘图API 小球是个圆 填充了很多颜色
+        // var ball = {
+        //     xPointer: 100,
+        //     yPointer: 100,
+        //     radius: 10,
+        //     color: 'blue'
+        // }
+        var balllist = [];
+
+        function update() {
+            // 小球动起来
+            // 运动的方向？ random
+            // 运动的速度？ random
+            for (var i = 0; i < balllist.length; i++) {
+                balllist[i].xPointer += balllist[i].vx * balllist[i].x;
+                balllist[i].yPointer += balllist[i].vy * balllist[i].y;
+                if (balllist[i].xPointer + balllist[i].radius >= canvas.width ||
+                    balllist[i].xPointer - balllist[i].radius <= 0) {
+                    balllist[i].x = balllist[i].x * -1;
+                }
+                if (balllist[i].yPointer + balllist[i].radius >= canvas.height ||
+                    balllist[i].yPointer - balllist[i].radius <= 0) {
+                    balllist[i].y = balllist[i].y * -1;
+                }
+            }
+
+        }
+
+        function init() {
+            for (var i = 0; i < 60; i++) {
+                var ball = {};
+                // 数据模型有了，比对着来造球
+                // 随机的坐标，封装成一个函数
+                ball.xPointer = getRandom(20, 980);
+                ball.yPointer = getRandom(20, 340);
+                ball.radius = 9;
+                ball.color = '#123123';
+                ball.x = getIndex(); //水平方向的运动方向
+                ball.y = getIndex(); //垂直方向的运动方向
+                ball.vx = Math.random();
+                ball.vy = Math.random();
+                balllist.push(ball);
+            }
+            console.log(balllist);
+            // js 里面 24是极小值 是页面刷新可以感知的最新时间
+            // 帧动画
+            // 1s =1000ms（/24）=41.666帧 游戏要求60帧
+            setInterval(() => {
+                // canvas 里面运动本质  不停的画，不停的擦除
+                draw();
+                // ball 没有擦，没有动
+                // 更新balllist
+                update();
+            }, 24)
+        }
+
+        // function drawLine() {
+        //     for (var i = 0; i < balllist.length; i++) {
+        //         for (var j = 0; j < balllist.length; j++) {
+        //             var xx=Math.pow(
+        //                 (balllist[i],xPointer
+        //                 -balllist[j].xPointer))
+        //             ctx.save();
+        //             ctx.beginPath();
+        //             ctx.strokeStyle = '#999999';
+        //             ctx.lineWidth = 0.1;
+        //             ctx.moveTo(balllist[i].xPointer, balllist[i].yPointer);
+        //             ctx.lineTo(balllist[j].xPointer, balllist[j].yPointer);
+        //             ctx.closePath();
+        //             ctx.stroke();
+        //             ctx.restore();
+        //         }
+        //     }
+        // }
+        //生成一个在范围内的随机数
+        function getRandom(start, end) {
+            var choice = end - start + 1;
+            return Math.floor(Math.random() * choice + start);
+        }
+        // 随机数通过取值0或1来判断方向
+        function getIndex() {
+            var arr = [0, 1];
+            var index = Math.floor(Math.random() * arr.length);
+            if (index == 0) {
+                index = -1;
+            } else {
+                index = 1;
+            }
+            return index;
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, 1000, 360);
+            for (var i = 0; i < balllist.length; i++) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.fillStyle = "#" + ("00000" + ((Math.random() * 16777215 + 0.5) >> 0).toString(16)).slice(-6);
+                ctx.arc(balllist[i].xPointer, balllist[i].yPointer, balllist[i].radius, 0, Math.PI * 2, false);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        window.addEventListener('load', function() {
+            init();
+        }, false);
+    </script>
+</body>
+
+</html>
